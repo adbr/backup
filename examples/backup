@@ -1,0 +1,35 @@
+#!/bin/sh
+# 2015-01-27 Adam Bryt
+
+# Podmontowanie dysku
+cryptmount -duid0=a3a6acb427840bc0.a -duid1=2296ac8273499ab8.d /backup
+if [ $0 -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /usr
+mirror -fs=/usr \
+	-dest=/backup/usr \
+	-exclude="*.core","*.tmp" \
+	-log=/home/adbr/lib/log/backup.log
+if [ $0 -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /usr/local
+mirror -fs=/usr/local \
+	-dest=/backup/usr_local \
+	-exclude="*.core","*.tmp" \
+	-log=/home/adbr/lib/log/backup.log
+if [ $0 -ne 0 ]; then
+	exit 1
+fi
+
+# Odmontowanie dysku
+cryptmount -u -duid0=a3a6acb427840bc0.a -duid1=2296ac8273499ab8.d
+if [ $0 -ne 0 ]; then
+	exit 1
+fi
+
+# Rotacja pliku z logami
+logrotate -file=/home/adbr/lib/log/backup.log -size=10M -max=10
