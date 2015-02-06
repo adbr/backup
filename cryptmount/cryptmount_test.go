@@ -29,7 +29,7 @@ func TestDiskName(t *testing.T) {
 		{
 			"xxxxxxxxxxxxxxxx",
 			"", // dysk nie isnieje
-			false,
+			true,
 		},
 	}
 

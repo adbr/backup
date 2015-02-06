@@ -129,9 +129,11 @@ var getDiskNames = func() (string, error) {
 	return s, nil
 }
 
+var errNoDisk = errors.New("dysk nie podłączony")
+
 // diskName zwraca nazwę dysku w /dev odpowiadającą unikalnemu
 // identyfikatorowi dysku duid. Jeśli dysk o danym duid nie istnieje to
-// zwraca string pusty. Np. dla duid 'e072adf1dcc1be16' zwróci 'sd0'.
+// zwraca errNoDisk. Np. dla duid 'e072adf1dcc1be16' zwróci 'sd0'.
 func diskName(duid string) (string, error) {
 	disks, err := getDiskNames()
 	if err != nil {
@@ -155,7 +157,7 @@ func diskName(duid string) (string, error) {
 		}
 	}
 
-	return "", nil
+	return "", errNoDisk
 }
 
 func split(diskspec string) (duid string, part string) {
@@ -166,16 +168,13 @@ func split(diskspec string) (duid string, part string) {
 
 // diskNameFull zwraca nazwę pliku specjalnego w /dev odpowiadającą dyskowi
 // disk. Parametr disk ma postać duid.part. Np. dla disk 'e072adf1dcc1be16.a'
-// zwróci '/dev/sd0a'. Jeśli dysk nie istnieje to zwraca string pusty.
+// zwróci '/dev/sd0a'. Jeśli dysk nie istnieje to zwraca errNoDisk.
 func diskNameFull(disk string) (string, error) {
 	duid, part := split(disk)
 
 	dev, err := diskName(duid)
 	if err != nil {
 		return "", err
-	}
-	if dev == "" {
-		return "", nil
 	}
 
 	name := "/dev/" + dev + part
@@ -186,11 +185,11 @@ func diskNameFull(disk string) (string, error) {
 // ma postać duid.part.
 func mountSoftraid(disk string) error {
 	dev, err := diskNameFull(disk)
+	if err == errNoDisk {
+		return fmt.Errorf("mountSoftraid: dysk nie podłączony: %q", disk)
+	}
 	if err != nil {
 		return fmt.Errorf("mountSoftraid: %s", err)
-	}
-	if dev == "" {
-		return fmt.Errorf("mountSoftraid: dysk nie podłączony: %q", disk)
 	}
 
 	// polecenie: bioctl -c C -l /dev/sd2a softraid0
@@ -211,11 +210,11 @@ func mountSoftraid(disk string) error {
 func unmountSoftraid(disk string) error {
 	duid, _ := split(disk)
 	dev, err := diskName(duid)
+	if err == errNoDisk {
+		return fmt.Errorf("unmountSoftraid: dysk nie podłączony: %q", disk)
+	}
 	if err != nil {
 		return fmt.Errorf("unmountSoftraid: %s", err)
-	}
-	if dev == "" {
-		return fmt.Errorf("unmountSoftraid: dysk nie podłączony: %q", disk)
 	}
 
 	// polecenie: bioctl -d sd3
@@ -232,28 +231,56 @@ func unmountSoftraid(disk string) error {
 }
 
 // isMountedSoftraid sprawdza czy dysk jest podpięty do softraid. Parametr disk
-// ma postać duid.part i powinien być dyskiem logicznym (rozszyfrowanym).
+// ma postać duid.part.
 func isMountedSoftraid(disk string) (bool, error) {
-	duid, _ := split(disk)
+	duid, part := split(disk)
 	dev, err := diskName(duid)
+	if err == errNoDisk {
+		return false, nil
+	}
 	if err != nil {
 		return false, fmt.Errorf("isMountedSoftraid: %s", err)
 	}
-	if dev == "" {
-		return false, nil
+
+	// polecenie: bioctl softraid0
+	cmd := exec.Command("bioctl", "softraid0")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		c := strings.Join(cmd.Args, " ")
+		out = bytes.TrimSpace(out)
+		if len(out) == 0 {
+			return false, fmt.Errorf("isMountedSoftraid: błąd polecenia '%s': %s", c, err)
+		} else {
+			return false, fmt.Errorf("isMountedSoftraid: błąd polecenia '%s': %s: %s", c, err, out)
+		}
 	}
-	return true, nil
+
+	d := "<" + dev + part + ">" // nazwa dysku na liście 'bioctl softraid0'
+	buf := bytes.NewBuffer(out)
+	scanner := bufio.NewScanner(buf)
+	for scanner.Scan() {
+		line := scanner.Text()
+		a := strings.Fields(line)
+		if len(a) == 6 && a[5] == d {
+			return true, nil
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return false, fmt.Errorf("isMountedSoftraid: %s", err)
+	}
+
+	return false, nil
 }
 
 // mountFFS montuje filesystem na dysku disk w katalogu dir. Argument
 // disk a postać duid.part.
 func mountFFS(disk string, dir string) error {
 	dev, err := diskNameFull(disk)
+	if err == errNoDisk {
+		return fmt.Errorf("mountFFS: dysk nie podłączony: %s", disk)
+	}
 	if err != nil {
 		return fmt.Errorf("mountFFS: %s", err)
-	}
-	if dev == "" {
-		return fmt.Errorf("mountFFS: dysk nie podłączony: %s", disk)
 	}
 
 	// polecenie: mount -o softdep /dev/sd2a /backup
@@ -273,11 +300,11 @@ func mountFFS(disk string, dir string) error {
 // postać duid.part.
 func unmountFFS(disk string) error {
 	dev, err := diskNameFull(disk)
+	if err == errNoDisk {
+		return fmt.Errorf("unmountFFS: dysk nie podłączony: %s", disk)
+	}
 	if err != nil {
 		return fmt.Errorf("unmountFFS: %s", err)
-	}
-	if dev == "" {
-		return fmt.Errorf("unmountFFS: dysk nie podłączony: %s", disk)
 	}
 
 	// polecenie: umount /dev/sd2a
@@ -297,11 +324,11 @@ func unmountFFS(disk string) error {
 // (rozszyfrowanym) jest podmontowany w katalogu dir.
 func isMountedFFS(disk string, dir string) (bool, error) {
 	dev, err := diskNameFull(disk)
+	if err == errNoDisk {
+		return false, nil
+	}
 	if err != nil {
 		return false, fmt.Errorf("isMountedFFS: %s", err)
-	}
-	if dev == "" {
-		return false, nil
 	}
 
 	// polecenie: mount
@@ -332,11 +359,11 @@ func isMountedFFS(disk string, dir string) (bool, error) {
 // duid.part.
 func fsck(disk string) error {
 	dev, err := diskNameFull(disk)
+	if err == errNoDisk {
+		return fmt.Errorf("fsck: dysk nie podłączony: %s", disk)
+	}
 	if err != nil {
 		return fmt.Errorf("fsck: %s", err)
-	}
-	if dev == "" {
-		return fmt.Errorf("fsck: dysk nie podłączony: %s", disk)
 	}
 
 	// polecenie: fsck -p /dev/sd2a
@@ -353,7 +380,7 @@ func fsck(disk string) error {
 }
 
 func mount(disk0, disk1 string, dir string) error {
-	mounted, err := isMountedSoftraid(disk1)
+	mounted, err := isMountedSoftraid(disk0)
 	if err != nil {
 		return err
 	}
@@ -403,7 +430,7 @@ func unmount(disk0, disk1 string, dir string) error {
 		log.Printf("filesystem %q już jest odmontowany od %q", disk1, dir)
 	}
 
-	mounted, err = isMountedSoftraid(disk1)
+	mounted, err = isMountedSoftraid(disk0)
 	if err != nil {
 		return err
 	}
@@ -420,12 +447,41 @@ func unmount(disk0, disk1 string, dir string) error {
 	return nil
 }
 
-func validate(disk string) bool {
-	a := strings.Split(disk, ".")
-	if len(a) != 2 {
-		return false
+func hexdigit(c rune) bool {
+	if '0' <= c && c <= '9' {
+		return true
 	}
-	return true
+	if 'a' <= c && c <= 'f' {
+		return true
+	}
+	return false
+}
+
+func validate(disk string) error {
+	a := strings.Split(disk, ".")
+	if len(a) < 2 {
+		return errors.New("brak specyfikacji partycji: brak znaku '.'")
+	}
+
+	if len(a) > 2 {
+		return errors.New("zła specyfikacja partycji: za dużo znaków '.'")
+	}
+
+	if len(a[0]) != 16 {
+		return errors.New("zła długość DUID")
+	}
+
+	for _, c := range a[0] {
+		if !hexdigit(c) {
+			return errors.New("DUID zawiera znaki nie 'hexdigit'")
+		}
+	}
+
+	if len(a[1]) != 1 {
+		return errors.New("zła długość specyfikacji partycji")
+	}
+
+	return nil
 }
 
 func main() {
@@ -440,13 +496,12 @@ func main() {
 		help()
 	}
 
-	if !validate(*disk0) {
-		fmt.Fprintf(os.Stderr, "nie poprawna wartość opcji -disk0: %q\n", *disk0)
+	if err := validate(*disk0); err != nil {
+		fmt.Fprintf(os.Stderr, "zła wartość opcji -disk0: %q: %s\n", *disk0, err)
 		usage()
 	}
-
-	if !validate(*disk1) {
-		fmt.Fprintf(os.Stderr, "nie poprawna wartość opcji -disk1: %q\n", *disk1)
+	if err := validate(*disk1); err != nil {
+		fmt.Fprintf(os.Stderr, "zła wartość opcji -disk1: %q: %s\n", *disk1, err)
 		usage()
 	}
 
