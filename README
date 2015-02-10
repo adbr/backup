@@ -17,7 +17,7 @@ Instalacja
 	$ go build
 	$ go install
 
-- Skompilować program snapshot i skopiować go do katalogu bib:
+- Skompilować program snapshot i skopiować go do katalogu bin:
 
 	$ cd snapshot
 	$ go build
