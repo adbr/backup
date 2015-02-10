@@ -202,8 +202,9 @@ func isMountedSoftraid() (bool, string, error) {
 
 	// uruchom polecenie 'bioctl softraid0'
 	cmd := exec.Command("bioctl", "softraid0")
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
+		log.Printf("%s", out)
 		c := strings.Join(cmd.Args, " ")
 		return false, "", fmt.Errorf("isMountedSoftraid: błąd polecenia %q: %s", c, err)
 	}
@@ -243,8 +244,9 @@ func isMountedFFS() (bool, error) {
 	// uruchomienie polecenia mount, wynik polecenia ma postać:
 	//    /dev/sd1l on /home type ffs (local, nodev, nosuid, softdep)
 	cmd := exec.Command("mount")
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
+		log.Printf("%s", out)
 		c := strings.Join(cmd.Args, " ")
 		return false, fmt.Errorf("isMountedFFS: błąd polecenia: %q: %s", c, err)
 	}
