@@ -1,0 +1,67 @@
+#!/bin/sh
+# 2015-01-27 Adam Bryt
+
+# Podmontowanie dysku
+cryptmount -disk0=a3a6acb427840bc0.a -disk1=2296ac8273499ab8.e -dir=/backup
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /
+snapshot -fs=/ \
+	-dest=/backup/root \
+	-logfile=/home/adbr/lib/log/backup.log
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /usr
+snapshot -fs=/usr \
+	-dest=/backup/usr \
+	-exclude="xobj/*,xenocara/*" \
+	-logfile=/home/adbr/lib/log/backup.log
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /usr/X11R6
+snapshot -fs=/usr/X11R6 \
+	-dest=/backup/usr_X11R6 \
+	-logfile=/home/adbr/lib/log/backup.log
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /usr/local
+snapshot -fs=/usr/local \
+	-dest=/backup/usr_local \
+	-logfile=/home/adbr/lib/log/backup.log
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /var
+snapshot -fs=/var \
+	-dest=/backup/var \
+	-logfile=/home/adbr/lib/log/backup.log
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Backup filesystemu /home
+snapshot -fs=/home \
+	-dest=/backup/home \
+	-exclude="tmp/*,.cache/*" \
+	-logfile=/home/adbr/lib/log/backup.log
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Odmontowanie dysku
+cryptmount -u -disk0=a3a6acb427840bc0.a -disk1=2296ac8273499ab8.e -dir=/backup
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+# Rotacja pliku z logami
+#logrotate -file=/home/adbr/lib/log/backup.log -size=10M -max=10

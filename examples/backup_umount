@@ -1,0 +1,8 @@
+#!/bin/sh
+# 2015-02-10 Adam Bryt
+
+# dysk testowy na pendrajwie
+#cryptmount -u -disk0=bc12a0da816b0702.a -disk1=ae478c27b7e9170c.a -dir=/backup
+
+# dysk USB dla backupów
+cryptmount -u -disk0=a3a6acb427840bc0.a -disk1=2296ac8273499ab8.e -dir=/backup
