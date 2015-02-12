@@ -1,26 +1,17 @@
 Narzędzia do robienia backupu typu snapshot z użyciem rsync.
 
-- cryptmount: Montuje szyfrowany dysk. Narzędzie dla systemu OpenBSD. 
-- snapshot: Kopiuje katalog przy użyciu rsync. Tworzy kolejne snapshoty w
-  katalogach o nazwach typu '2015-02-10T18:07:39'.
+- snapshot: Kopiuje katalog przy użyciu rsync - tworzy kolejne snapshoty w
+	katalogach o nazwach typu '2015-02-10T18:07:39'.
+
+- logrotate: Program do rotacji logów.
+
+- cryptmount: Montuje szyfrowany dysk - narzędzie dla systemu OpenBSD. 
+
 - examples: Przykładowe skrypty.
 
 Instalacja
 ----------
 
 - Zainstalować rsync.
-
-- Skompilować program cryptmount i skopiować go do katalogu bin.
-  (opcjonalnie - tylko dla OpenBSD):
-
-	$ cd cryptmount
-	$ go build
-	$ go install
-
-- Skompilować program snapshot i skopiować go do katalogu bin:
-
-	$ cd snapshot
-	$ go build
-	$ go install
-
+- Skompilować i zainstalować w bin programy snapshot, logrotate, cryptmount
 - Skopiować skrypty z examples do katalogu bin i zmodyfikować je.

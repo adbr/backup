@@ -1,7 +1,7 @@
 // 2015-02-10 Adam Bryt
 
 /*
-Program cryptmount podłącza szyfrowaną partycję do softraid a
+Program cryptmount podłącza szyfrowaną partycję do softraid a,
 następnie montuje partycję na szyfrowanym dysku do filesystemu.
 
 Jest przeznaczony dla systemu OpenBSD. Do obsługi szyfrowanej
@@ -15,7 +15,7 @@ polecenia 'sysctl hw.disknames'.
 
 Sposób użycia:
 
-     cryptmount [flags] -disk0=diskspec -disk1=diskspec -dir=dir
+	cryptmount [flags] -disk0=diskspec -disk1=diskspec -dir=dir
 
 Wartości opcji disk0 i disk1 (diskspec) mają format 'DUID.PART',
 gdzie DUID jest unikalnym identyfikatorem dysku z disklabel, a PART
@@ -27,21 +27,21 @@ fizycznym (np. USB), która zostanie podłączona do softraid0.
 Opcja -disk1 specyfikuje partycję typu FFS na rozszyfrowanym dysku
 logicznym, która zostanie podmontowana w katologu dir.
 
-Opcje:
+Flagi:
 
-     -disk0=""
-        dysk i partycja zaszyfrowana typu RAID do podłączenie do
-        softraid (opcja wymagana)
-     -disk1=""
-        dysk i partycja typu FFS na rozszyfrowanym dysku logicznym
-        do podmontowania w katalogu dir (opcja wymagana)
-     -dir=""
-     	katalog do podmontowania filesystemu (opcja wymagana)
-     -mountopts="-o softdep"
-     	opcje polecenia mount
-     -u=false
-     	odmontuj dyski (unmount)
-     -h=false
-     	wyświetl help
+	-disk0=""
+		dysk i partycja zaszyfrowana typu RAID do podłączenie do
+		softraid (opcja wymagana)
+	-disk1=""
+		dysk i partycja typu FFS na rozszyfrowanym dysku logicznym do
+		podmontowania w katalogu dir (opcja wymagana)
+	-dir=""
+		katalog do podmontowania filesystemu (opcja wymagana)
+	-mountopts="-o softdep"
+		opcje polecenia mount
+	-u=false
+		odmontuj dyski (unmount)
+	-h=false
+		wyświetl help
 */
 package main
