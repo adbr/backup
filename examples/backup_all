@@ -64,4 +64,4 @@ if [ $? -ne 0 ]; then
 fi
 
 # Rotacja pliku z logami
-#logrotate -file=/home/adbr/lib/log/backup.log -size=10M -max=10
+logrotate -size=10000000 -num=10 /home/adbr/lib/log/backup.log
