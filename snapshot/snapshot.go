@@ -69,13 +69,13 @@ func logBuf(prefix string, buf *bytes.Buffer) {
 func rsyncSnapshot() error {
 	var cmdargs = []string{"rsync", "-avxH"}
 
-	// utworzenie podkatalogu snapshot
-	log.Printf("utworzenie podkatalogu '%s'", dsnapshot)
+	// utworzenie katalogu snapshot
 	snapdir := path.Join(*dest, dsnapshot)
+	log.Printf("utworzenie katalogu '%s'", dsnapshot)
 	err := os.Mkdir(snapdir, os.ModePerm)
 	if err != nil {
 		if os.IsExist(err) {
-			msg := "WARNING: katalog '%s' już istnieje - " +
+			msg := "WARNING: katalog '%s' już istnieje: " +
 				"nie dokończony poprzedni snapshot?"
 			log.Printf(msg, snapdir)
 		} else {
@@ -88,8 +88,7 @@ func rsyncSnapshot() error {
 	info, err := os.Stat(lastdir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			msg := "WARNING: katalog z poprzednim snapshotem " +
-				"nie istnieje: %s - pierwszy snapshot?"
+			msg := "WARNING: katalog '%s' nie istnieje: pierwszy snapshot?"
 			log.Printf(msg, lastdir)
 		} else {
 			return err
@@ -122,7 +121,7 @@ func rsyncSnapshot() error {
 	}
 
 	cmdstr := strings.Join(cmd.Args, " ")
-	log.Printf("polecenie: '%s'", cmdstr)
+	log.Printf("kopiowanie danych poleceniem: '%s'", cmdstr)
 
 	err = cmd.Start()
 	if err != nil {
@@ -149,18 +148,18 @@ func rsyncSnapshot() error {
 	// zmiana nazwy katalogu ze snapshotem
 	ts := timestamp()
 	tsdir := path.Join(*dest, ts)
+	log.Printf("zmiana nazwy katalogu '%s' na '%s'", dsnapshot, ts)
 	err = os.Rename(snapdir, tsdir)
 	if err != nil {
 		return err
 	}
 
 	// ustawienie last na nowy snapshot
-	log.Printf("ustawienie symlinku '%s' na '%s'", dlast, ts)
+	log.Printf("zmiana symlinku '%s' -> '%s'", dlast, ts)
 	err = os.Remove(lastdir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			msg := "WARNING: katalog z poprzednim snapshotem " +
-				"nie istnieje: %s - pierwszy snapshot?"
+			msg := "WARNING: katalog '%s' nie istnieje: pierwszy snapshot?"
 			log.Printf(msg, lastdir)
 		} else {
 			return err
@@ -188,7 +187,8 @@ func snapshot() error {
 	}
 
 	log.Print("początek snapshotu")
-	log.Printf("filesystem: %q, katalog docelowy: %q", *fs, *dest)
+	log.Printf("filesystem: '%s'", *fs)
+	log.Printf("katalog docelowy: '%s'", *dest)
 	begin := time.Now() // czas początku snapshotu
 
 	err := rsyncSnapshot()
