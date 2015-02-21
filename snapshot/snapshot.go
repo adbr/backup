@@ -18,10 +18,12 @@ import (
 )
 
 var (
-	fs      = flag.String("fs", "", "filesystem")
-	dest    = flag.String("dest", "", "katalog docelowy")
-	exclude = flag.String("exclude", "", "co pominąć")
-	logfile = flag.String("logfile", "", "logfile")
+	fs          = flag.String("fs", "", "filesystem")
+	dest        = flag.String("dest", "", "katalog docelowy")
+	exclude     = flag.String("exclude", "", "co pominąć")
+	logfile     = flag.String("logfile", "", "logfile")
+	rsync       = flag.String("rsync", "rsync", "polecenie rsync")
+	rsync_flags = flag.String("rsync_flags", "-avxH", "flagi polecenia rsync")
 )
 
 const (
@@ -30,14 +32,12 @@ const (
 )
 
 const usageStr = `usage: snapshot -fs=filesystem -dest=dir [flags]
-	-fs=""
-		kopiowany filesystem
-	-dest=""
-		katalog docelowy
-	-exclude=""
-		lista wzorców ignorowanych plików (pattern,pattern,...)
-	-logfile=""
-		plik z logami`
+	-fs="": kopiowany filesystem
+	-dest="": katalog docelowy
+	-exclude="": lista wzorców ignorowanych plików (pattern,pattern,...)
+	-logfile="": plik z logami
+	-rsync="rsync": polecenie 'rsync'
+	-rsync_flags="-avxH": flagi polecenia rsync`
 
 func usage() {
 	fmt.Fprintln(os.Stderr, usageStr)
@@ -67,7 +67,10 @@ func logBuf(prefix string, buf *bytes.Buffer) {
 }
 
 func rsyncSnapshot() error {
-	var cmdargs = []string{"rsync", "-avxH"}
+	var cmdargs = []string{*rsync}
+
+	rsyncFlags := strings.Fields(*rsync_flags)
+	cmdargs = append(cmdargs, rsyncFlags...)
 
 	// utworzenie katalogu snapshot
 	snapdir := path.Join(*dest, dsnapshot)

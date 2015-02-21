@@ -20,6 +20,10 @@ Flagi:
 		lista wzorców ignorowanych plików (pattern,pattern,...)
 	-logfile=""
 		plik z logami
+	-rsync="rsync"
+		polecenie 'rsync'
+	-rsync_flags="-avxH"
+		flagi polecenia rsync`
 
 Do kopiowania jest używane polecenie rsync(1) z następującymi opcjami:
 
