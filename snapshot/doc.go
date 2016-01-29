@@ -22,7 +22,7 @@ Flagi:
 		plik z logami
 	-rsync="rsync"
 		polecenie 'rsync'
-	-rsync_flags="-avxH"
+	-rsync_flags="-avxH8"
 		flagi polecenia rsync`
 
 Do kopiowania jest używane polecenie rsync(1) z następującymi opcjami:
@@ -31,6 +31,7 @@ Do kopiowania jest używane polecenie rsync(1) z następującymi opcjami:
 	-v			verbose
 	-x			don't cross filesystem boundaries
 	-H			preserve hard links
+	-8			8-bit output
 	--link-dest=DIR		hardlink to files in DIR when unchanged
 	--exclude=PATTERN	exclude files matching PATTERN
 */

@@ -23,7 +23,7 @@ var (
 	exclude     = flag.String("exclude", "", "co pominąć")
 	logfile     = flag.String("logfile", "", "logfile")
 	rsync       = flag.String("rsync", "rsync", "polecenie rsync")
-	rsync_flags = flag.String("rsync_flags", "-avxH", "flagi polecenia rsync")
+	rsync_flags = flag.String("rsync_flags", "-avxH8", "flagi polecenia rsync")
 )
 
 const (
@@ -37,7 +37,7 @@ const usageStr = `usage: snapshot -fs=filesystem -dest=dir [flags]
 	-exclude="": lista wzorców ignorowanych plików (pattern,pattern,...)
 	-logfile="": plik z logami
 	-rsync="rsync": polecenie 'rsync'
-	-rsync_flags="-avxH": flagi polecenia rsync`
+	-rsync_flags="-avxH8": flagi polecenia rsync`
 
 func usage() {
 	fmt.Fprintln(os.Stderr, usageStr)
