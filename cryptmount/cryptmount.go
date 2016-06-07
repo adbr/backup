@@ -174,10 +174,10 @@ func isMountedSoftraid() (bool, string, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		a := strings.Fields(line)
-		if len(a) == 6 && a[5] == "CRYPTO" {
+		if a[2] == "Online" && a[5] == "CRYPTO" {
 			ldev = a[4]
 		}
-		if len(a) == 6 && a[5] == dev {
+		if a[1] == "Online" && a[5] == dev {
 			return true, ldev, nil
 		}
 	}
