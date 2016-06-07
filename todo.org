@@ -1,0 +1,7 @@
+[2016-06-07 Tue]
+
+* TODO montować dysk i fs z użyciem DUID
+  [2016-06-07 Tue]
+
+W poleceniach bioctl i mount/umount można stosować DIUD zamiast nazw
+dysków -- przez stosowanie DUID można by uprościć kod cryptmount.
