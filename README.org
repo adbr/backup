@@ -1,16 +1,17 @@
+* backup
+
 Narzędzia do robienia backupu typu snapshot z użyciem rsync.
 
 - snapshot: kopiuje katalog przy użyciu rsync - tworzy kolejne snapshoty w
-	katalogach o nazwach typu '2015-02-10T18:07:39'.
+	katalogach o nazwach typu '2015-02-10T18:07:39'
 
-- logrotate: program do rotacji logów.
+- logrotate: program do rotacji logów
 
-- cryptmount: montuje szyfrowany dysk - narzędzie dla systemu OpenBSD. 
+- cryptmount: montuje szyfrowany dysk - narzędzie dla systemu OpenBSD
 
-- examples: przykładowe skrypty.
+- examples: przykładowe skrypty
 
-Instalacja
-----------
+** Instalacja
 
 - Zainstalować rsync.
 - Skompilować i zainstalować w bin programy snapshot, logrotate, cryptmount
