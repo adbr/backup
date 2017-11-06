@@ -106,7 +106,6 @@ func unmount(disk string) error {
 const usageText = `Sposób użycia:
 	cryptmount [opcje] -disk0=diskspec -disk1=diskspec -dir=directory
 Opcje:
-
 	-disk0 diskspec
 		dysk i partycja (DUID.PART) typu RAID, zaszyfrowana,
 		do podłączenie do softraid
