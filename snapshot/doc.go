@@ -8,22 +8,21 @@ kopiowane tylko są tworzone hard linki do plików w poprzednim
 snapshocie.
 
 Sposób użycia:
-
-	snapshot -fs=filesystem -dest=dir [flags]
-
-Flagi:
-	-fs=""
-		kopiowany filesystem
-	-dest=""
+	snapshot [opcje] -fs=filesystem -dest=directory
+Opcje:
+	-fs filesystem
+		backupowany filesystem
+	-dest directory
 		katalog docelowy
-	-exclude=""
-		lista wzorców ignorowanych plików (pattern,pattern,...)
-	-logfile=""
-		plik z logami
-	-rsync="rsync"
-		polecenie 'rsync'
-	-rsync_flags="-avxH8"
-		flagi polecenia rsync`
+	-exclude string
+		lista wzorców ignorowanych plików "pattern,pattern,..."
+		(domyślnie: "")
+	-logfile filename
+		plik z logami (domyślnie: "")
+	-rsync filename
+		nazwa polecenia rsync (domyślnie: "rsync")
+	-rsync_flags string
+		opcje polecenia rsync (domyślnie: "-avxH8")
 
 Do kopiowania jest używane polecenie rsync(1) z następującymi opcjami:
 

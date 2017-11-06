@@ -18,31 +18,20 @@ import (
 )
 
 var (
-	fs          = flag.String("fs", "", "filesystem")
-	dest        = flag.String("dest", "", "katalog docelowy")
-	exclude     = flag.String("exclude", "", "co pominąć")
-	logfile     = flag.String("logfile", "", "logfile")
-	rsync       = flag.String("rsync", "rsync", "polecenie rsync")
-	rsync_flags = flag.String("rsync_flags", "-avxH8", "flagi polecenia rsync")
+	fs          = flag.String("fs", "", "")
+	dest        = flag.String("dest", "", "")
+	exclude     = flag.String("exclude", "", "")
+	logfile     = flag.String("logfile", "", "")
+	rsync       = flag.String("rsync", "rsync", "")
+	rsync_flags = flag.String("rsync_flags", "-avxH8", "")
+	h           = flag.Bool("h", false, "")
+	help        = flag.Bool("help", false, "")
 )
 
 const (
 	dlast     = "last"     // nazwa symlinku do poprzedniego snapshotu
 	dsnapshot = "snapshot" // katalog z aktualnym snapshotem
 )
-
-const usageStr = `usage: snapshot -fs=filesystem -dest=dir [flags]
-	-fs="": kopiowany filesystem
-	-dest="": katalog docelowy
-	-exclude="": lista wzorców ignorowanych plików (pattern,pattern,...)
-	-logfile="": plik z logami
-	-rsync="rsync": polecenie 'rsync'
-	-rsync_flags="-avxH8": flagi polecenia rsync`
-
-func usage() {
-	fmt.Fprintln(os.Stderr, usageStr)
-	os.Exit(1)
-}
 
 func parseExclude(s string) []string {
 	var opts []string
@@ -224,21 +213,92 @@ func validateDir(dir string) error {
 }
 
 func main() {
-	flag.Usage = usage
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, usageText)
+	}
 	flag.Parse()
 
-	if err := validateDir(*fs); err != nil {
-		fmt.Fprintf(os.Stderr, "zła wartość opcji -fs: %q: %s\n", *fs, err)
-		usage()
+	if *h {
+		fmt.Print(usageText)
+		return
+	}
+	if *help {
+		fmt.Print(helpText)
+		return
 	}
 
+	// sprawdzanie wymaganych opcji
+	if err := validateDir(*fs); err != nil {
+		fmt.Fprintf(os.Stderr, "zła wartość opcji -fs: %s\n", err)
+		fmt.Fprint(os.Stderr, usageText)
+		os.Exit(2)
+	}
 	if err := validateDir(*dest); err != nil {
-		fmt.Fprintf(os.Stderr, "zła wartość opcji -dest: %q: %s\n", *dest, err)
-		usage()
+		fmt.Fprintf(os.Stderr, "zła wartość opcji -dest: %s\n", err)
+		fmt.Fprint(os.Stderr, usageText)
+		os.Exit(2)
 	}
 
 	err := snapshot()
 	if err != nil {
-		os.Exit(2)
+		os.Exit(1)
 	}
 }
+
+// Stała usageText zawiera opis opcji programu wyświetlany przy użyciu
+// opcji -h lub w przypadku błędu parsowania opcji.
+const usageText = `Sposób użycia:
+	snapshot [opcje] -fs=filesystem -dest=directory
+Opcje:
+	-fs filesystem
+		backupowany filesystem
+	-dest directory
+		katalog docelowy
+	-exclude string
+		lista wzorców ignorowanych plików "pattern,pattern,..."
+		(domyślnie: "")
+	-logfile filename
+		plik z logami (domyślnie: "")
+	-rsync filename
+		nazwa polecenia rsync (domyślnie: "rsync")
+	-rsync_flags string
+		opcje polecenia rsync (domyślnie: "-avxH8")
+`
+
+// Stała helpText zawiera opis programu wyświetlany przy użyciu opcji
+// -help. Treść jest identyczna jak w doc comment programu z pliku
+// doc.go.
+const helpText = `
+Program snapshot kopiuje katalog przy użyciu polecenia rsync(1). Tworzy
+kolejne snapshoty w katalogach o nazwach typu '2015-02-10T18:07:39'.
+Jeśli pliki w aktualnym snapshocie nie zmieniły się, to nie są
+kopiowane tylko są tworzone hard linki do plików w poprzednim
+snapshocie.
+
+Sposób użycia:
+	snapshot [opcje] -fs=filesystem -dest=directory
+Opcje:
+	-fs filesystem
+		backupowany filesystem
+	-dest directory
+		katalog docelowy
+	-exclude string
+		lista wzorców ignorowanych plików "pattern,pattern,..."
+		(domyślnie: "")
+	-logfile filename
+		plik z logami (domyślnie: "")
+	-rsync filename
+		nazwa polecenia rsync (domyślnie: "rsync")
+	-rsync_flags string
+		opcje polecenia rsync (domyślnie: "-avxH8")
+
+Do kopiowania jest używane polecenie rsync(1) z następującymi opcjami:
+
+	-a			archive mode
+	-v			verbose
+	-x			don't cross filesystem boundaries
+	-H			preserve hard links
+	-8			8-bit output
+	--link-dest=DIR		hardlink to files in DIR when unchanged
+	--exclude=PATTERN	exclude files matching PATTERN
+`
