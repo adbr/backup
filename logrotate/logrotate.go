@@ -15,17 +15,12 @@ import (
 )
 
 var (
-	num  = flag.Int("num", 0, "liczba archiwizowanych plików (0 bez ograniczeń)")
-	size = flag.Int64("size", 0, "wielkość (w bajtach) archiwizowanego pliku (0 bez rotacji)")
+	// TODO: zmienić typ na uint? - co gdy wartość ujemna?
+	num  = flag.Int("num", 0, "")
+	size = flag.Int64("size", 0, "")
+	h    = flag.Bool("h", false, "")
+	help = flag.Bool("help", false, "")
 )
-
-const usageStr = "usage: logrotate [flags] logfile"
-
-func usage() {
-	fmt.Fprintln(os.Stderr, usageStr)
-	flag.PrintDefaults()
-	os.Exit(1)
-}
 
 // Rozszerzenia skompresowanych archiwalnych plików z logami.
 var cexts = []string{".gz"}
@@ -188,11 +183,27 @@ func logrotate(file string) error {
 }
 
 func main() {
-	flag.Usage = usage
+	log.SetPrefix("logrotate: ")
+	log.SetFlags(0)
+	
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, usageText)
+	}
 	flag.Parse()
 
+	if *h {
+		fmt.Print(usageText)
+		return
+	}
+	if *help {
+		fmt.Print(helpText)
+		return
+	}
+
 	if flag.NArg() != 1 {
-		flag.Usage()
+		log.Print("brak argumentu logfile")
+		fmt.Fprint(os.Stderr, usageText)
+		os.Exit(2)
 	}
 
 	file := flag.Arg(0)
@@ -214,3 +225,49 @@ func main() {
 		}
 	}
 }
+
+// Stała usageText zawiera opis opcji programu wyświetlany przy użyciu
+// opcji -h lub w przypadku błędu parsowania opcji.
+const usageText = `Sposób użycia:
+	logrotate [opcje] logfile
+Opcje:
+	-num int
+		maksymalna liczba archiwizowanych plików (domyślnie:
+		0, czyli bez ograniczenia)
+	-size int
+		wielkość (w bajtach) archiwizowanego pliku, jeśli
+		rozmiar pliku logfile jest większy niż -size to plik
+		jest archiwizowany (domyślnie: 0, czyli bez
+		ograniczenia)
+`
+
+// Stała helpText zawiera opis programu wyświetlany przy użyciu opcji
+// -help. Treść jest identyczna jak w doc comment programu z pliku
+// doc.go.
+const helpText = `
+Program logrotate służy do rotacji plików z logami. Jeśli rozmiar
+pliku jest większy niż wartość podana w opcji -size to plik jest
+archiwizowany: nazwa pliku log jest zmieniana na log.0 i tworzony jest
+pusty plik log.
+
+Jeśli istnieją wcześniej zarchiwizowane pliki z logami to ich numery
+są zwiększane, np:
+
+	log.0 -> log.1
+	log.1 -> log.2
+	...
+
+Maksymalną liczbę zarchiwizowanych plików z logami określa opcja -num.
+
+Sposób użycia:
+	logrotate [opcje] logfile
+Opcje:
+	-num int
+		maksymalna liczba archiwizowanych plików (domyślnie:
+		0, czyli bez ograniczenia)
+	-size int
+		wielkość (w bajtach) archiwizowanego pliku, jeśli
+		rozmiar pliku logfile jest większy niż -size to plik
+		jest archiwizowany (domyślnie: 0, czyli bez
+		ograniczenia)
+`
