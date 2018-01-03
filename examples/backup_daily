@@ -8,16 +8,16 @@ if [ $? -ne 0 ]; then
 fi
 
 # Backup filesystemu /var
-snapshot -fs=/var \
-	-dest=/backup/var \
+snapshot -src=/var \
+	-dst=/backup/var \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
 	exit 1
 fi
 
 # Backup filesystemu /home
-snapshot -fs=/home \
-	-dest=/backup/home \
+snapshot -src=/home \
+	-dst=/backup/home \
 	-exclude="adbr/tmp/*,.cache/*" \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then

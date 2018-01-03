@@ -8,16 +8,16 @@ if [ $? -ne 0 ]; then
 fi
 
 # Backup filesystemu /
-snapshot -fs=/ \
-	-dest=/backup/root \
+snapshot -src=/ \
+	-dst=/backup/root \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
 	exit 1
 fi
 
 # Backup filesystemu /usr
-snapshot -fs=/usr \
-	-dest=/backup/usr \
+snapshot -src=/usr \
+	-dst=/backup/usr \
 	-exclude="xobj/*,xenocara/*" \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
@@ -25,32 +25,32 @@ if [ $? -ne 0 ]; then
 fi
 
 # Backup filesystemu /usr/X11R6
-snapshot -fs=/usr/X11R6 \
-	-dest=/backup/usr_X11R6 \
+snapshot -src=/usr/X11R6 \
+	-dst=/backup/usr_X11R6 \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
 	exit 1
 fi
 
 # Backup filesystemu /usr/local
-snapshot -fs=/usr/local \
-	-dest=/backup/usr_local \
+snapshot -src=/usr/local \
+	-dst=/backup/usr_local \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
 	exit 1
 fi
 
 # Backup filesystemu /var
-snapshot -fs=/var \
-	-dest=/backup/var \
+snapshot -src=/var \
+	-dst=/backup/var \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
 	exit 1
 fi
 
 # Backup filesystemu /home
-snapshot -fs=/home \
-	-dest=/backup/home \
+snapshot -src=/home \
+	-dst=/backup/home \
 	-exclude="adbr/tmp/*,.cache/*" \
 	-logfile=/home/adbr/lib/log/backup.log
 if [ $? -ne 0 ]; then
