@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/adbr/backup/snapshot"
+	"github.com/adbr/backup/internal/snapshot"
 )
 
 func main() {

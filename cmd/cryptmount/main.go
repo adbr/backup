@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/adbr/backup/cryptmount"
+	"github.com/adbr/backup/internal/cryptmount"
 )
 
 func main() {
