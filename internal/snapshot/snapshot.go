@@ -25,7 +25,7 @@ var (
 // zawiera listę wzorców ignorowanych plików w postaci
 // "pattern,pattern,...".
 func Snapshot(src, dst, exclude string) error {
-	info("początek snapshotu")
+	info("===> początek snapshotu")
 	info("src: %q", src)
 	info("dst: %q", dst)
 	begin := time.Now()
@@ -62,7 +62,7 @@ func Snapshot(src, dst, exclude string) error {
 
 	// uruchomienie polecenia rsync
 	cmd := exec.Command(RsyncCommand, args...)
-	info("executing: %q", strings.Join(cmd.Args, " "))
+	info("polecenie: %q", strings.Join(cmd.Args, " "))
 	cmd.Stderr = os.Stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -91,7 +91,7 @@ func Snapshot(src, dst, exclude string) error {
 	// zmiana nazwy katalogu ze snapshotem na timestamp
 	timestamp := timestamp()
 	timestampdir := filepath.Join(dst, timestamp)
-	info("zmiana nazwy katalog %q na %q", "snapshot", timestamp)
+	info("zmiana nazwy katalogu %q na %q", "snapshot", timestamp)
 	err = os.Rename(snapshotdir, timestampdir)
 	if err != nil {
 		return err

@@ -25,7 +25,7 @@ func MountSoftraid(disk string) error {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	log.Printf("executing: %q", strings.Join(cmd.Args, " "))
+	log.Printf("polecenie: %q", strings.Join(cmd.Args, " "))
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("bioctl: %s", err)
@@ -44,7 +44,7 @@ func UnmountSoftraid(disk string) error {
 	cmd := exec.Command("/sbin/bioctl", "-d", disk)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	log.Printf("executing: %q", strings.Join(cmd.Args, " "))
+	log.Printf("polecenie: %q", strings.Join(cmd.Args, " "))
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("bioctl: %s", err)
@@ -65,7 +65,7 @@ func MountFS(disk, dir, options string) error {
 	cmd := exec.Command("/sbin/mount", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	log.Printf("executing: %q", strings.Join(cmd.Args, " "))
+	log.Printf("polecenie: %q", strings.Join(cmd.Args, " "))
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("mount: %s", err)
@@ -81,7 +81,7 @@ func UnmountFS(disk string) error {
 	cmd := exec.Command("/sbin/umount", disk)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	log.Printf("executing: %q", strings.Join(cmd.Args, " "))
+	log.Printf("polecenie: %q", strings.Join(cmd.Args, " "))
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("umount: %s", err)
@@ -98,7 +98,7 @@ func Fsck(disk string) error {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	log.Printf("executing: %q", strings.Join(cmd.Args, " "))
+	log.Printf("polecenie: %q", strings.Join(cmd.Args, " "))
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("fsck: %s", err)
