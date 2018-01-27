@@ -26,5 +26,8 @@ Opcje:
 		rozmiar pliku logfile jest większy niż -size to plik
 		jest archiwizowany (domyślnie: 0, czyli bez
 		ograniczenia)
+	-v	wyświetlanie komunikatów (verbose)
+	-h	sposób użycia
+	-help	dokumentacja
 */
 package main

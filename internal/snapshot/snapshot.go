@@ -25,7 +25,7 @@ var (
 // zawiera listę wzorców ignorowanych plików w postaci
 // "pattern,pattern,...".
 func Snapshot(src, dst, exclude string) error {
-	info("===> początek snapshotu (%s)", timestamp())
+	info("=== początek snapshotu (%s)", timestamp())
 	info("src: %q", src)
 	info("dst: %q", dst)
 	begin := time.Now()
