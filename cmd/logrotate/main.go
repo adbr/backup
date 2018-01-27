@@ -36,7 +36,6 @@ func main() {
 		os.Exit(2)
 	}
 
-	// wywołanie funkcji z pakietu logrotate
 	file := flag.Arg(0)
 	logrotate.Verbose = *v
 	err := logrotate.Rotate(file, *size, *num)
