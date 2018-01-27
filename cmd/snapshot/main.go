@@ -51,6 +51,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "snapshot: logfile: %s\n", err)
 			os.Exit(2)
 		}
+		defer file.Close()
 		snapshot.LogFile = file
 	}
 
